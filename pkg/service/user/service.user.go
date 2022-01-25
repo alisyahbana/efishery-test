@@ -1,9 +1,13 @@
 package user
 
 import (
+	"errors"
 	"fmt"
 	"github.com/alisyahbana/efishery-test/pkg/common/helper"
+	"github.com/alisyahbana/efishery-test/pkg/common/key"
 	"github.com/alisyahbana/efishery-test/pkg/service/user/data"
+	"github.com/dgrijalva/jwt-go"
+	"log"
 	"time"
 )
 
@@ -54,4 +58,34 @@ func (s UserService) Register(payload RegisterPayload) (*RegisterResponse, error
 
 		return &RegisterResponse{GeneratedPassword: generatedPassword}, nil
 	}
+}
+
+type LoginPayload struct {
+	Phone    string `json:"phone"`
+	Password string `json:"password"`
+}
+
+func (s UserService) Login(payload LoginPayload) (*string, error) {
+	userData, err := s.data.GetUserByPhoneAndPassword(payload.Phone, payload.Password)
+	if err != nil {
+		return nil, err
+	}
+	if userData == nil {
+		return nil, fmt.Errorf("user not found")
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"name":  userData.Username,
+		"phone": userData.Phone,
+		//"role":      userData.Role,
+		"timestamp": userData.CreatedAt,
+	})
+
+	tokenString, err := token.SignedString([]byte(key.GetConfig().SignatureJwt))
+	if err != nil {
+		log.Println(err)
+		err = errors.New("Failed to sign JWT token")
+		return nil, err
+	}
+
+	return &tokenString, nil
 }

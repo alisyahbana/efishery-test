@@ -19,6 +19,7 @@ type UpdatePayload struct {
 type UserData interface {
 	CreateUser(user User) (uint64, error)
 	GetUser(username string) (*User, error)
+	GetUserByPhoneAndPassword(phone string, password string) (*User, error)
 	//UpdateUser(payload UpdatePayload) error
 	//DeleteUser(username string) error
 }
