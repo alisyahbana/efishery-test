@@ -1,0 +1,4 @@
+{
+  "masterConnString": "root:password@tcp(127.0.0.1:3306)/efishery_db?parseTime=true",
+  "slaveConnString": "root:password@tcp(127.0.0.1:3306)/efishery_db?parseTime=true"
+}
