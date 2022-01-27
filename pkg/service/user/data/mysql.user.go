@@ -10,9 +10,9 @@ type MysqlUserData struct {
 }
 
 const (
-	CreateUserQuery                = `INSERT INTO user (username, password, phone) VALUES (?, ?, ?)`
-	GetUserQuery                   = `SELECT username, password, phone, created_at, updated_at FROM user WHERE username = ? LIMIT 1`
-	GetUserByPhoneAndPasswordQuery = `SELECT username, password, phone, created_at, updated_at FROM user WHERE phone = ? AND password = ? LIMIT 1`
+	CreateUserQuery                = `INSERT INTO user (username, role, password, phone) VALUES (?, ?, ?, ?)`
+	GetUserQuery                   = `SELECT username, role, password, phone, created_at, updated_at FROM user WHERE username = ? LIMIT 1`
+	GetUserByPhoneAndPasswordQuery = `SELECT username, role, password, phone, created_at, updated_at FROM user WHERE phone = ? AND password = ? LIMIT 1`
 	//UpdateUserQuery = `UPDATE user SET email = ?, address= ? WHERE username = ?`
 	//DeleteUserQuery = `DELETE FROM user WHERE username = ?`
 )
@@ -38,6 +38,7 @@ func init() {
 func (m MysqlUserData) CreateUser(user User) (uint64, error) {
 	newUser, err := stmt.CreateUserQuery.Exec(
 		user.Username,
+		user.Role,
 		user.Password,
 		user.Phone,
 	)

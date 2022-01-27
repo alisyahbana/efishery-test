@@ -7,6 +7,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 func RegisterHandler(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
@@ -56,4 +57,16 @@ func LoginHandler(writer http.ResponseWriter, request *http.Request, params http
 }
 
 func AuthTokenHandler(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	bearerToken := request.Header.Get("Authorization")
+	tempString := strings.Split(bearerToken, " ")
+	tokenString := tempString[1]
+
+	claims, err := user.New().ValidateToken(tokenString)
+	if err != nil {
+		helper.ErrorReturn(writer, http.StatusInternalServerError, err)
+		return
+	}
+
+	helper.SuccessReturn(writer, claims)
+	return
 }

@@ -6,8 +6,16 @@ type User struct {
 	Username  string    `json:"username" db:"username"`
 	Password  string    `json:"password" db:"password"`
 	Phone     string    `json:"phone" db:"phone"`
+	Role      string    `json:"role" db:"role"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+}
+
+type UserClaims struct {
+	Username  string `json:"username"`
+	Phone     string `json:"phone"`
+	Role      string `json:"role"`
+	Timestamp string `json:"timestamp"`
 }
 
 type UpdatePayload struct {
