@@ -2,11 +2,14 @@ package helper
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/alisyahbana/efishery-test/pkg/common/key"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/karirdotcom/qframework/pkg/common/qerror"
 	"golang.org/x/crypto/bcrypt"
+	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"strings"
@@ -153,4 +156,37 @@ func RandStringBytes(n int) string {
 		b[i] = letterBytes[rand.Intn(len(letterBytes))]
 	}
 	return string(b)
+}
+
+type CurrencyRate struct {
+	Ratio float64 `json:"IDR_USD"`
+}
+
+func GetRatioUSD() (float64, error) {
+	var rate CurrencyRate
+	apiKey := "a89dabc7c704a030831d"
+
+	url := fmt.Sprintf("https://free.currconv.com/api/v7/convert?q=IDR_USD&compact=ultra&apiKey=%s", apiKey)
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Println(err)
+		err = errors.New("Failed to get conversion rate")
+		return 0, err
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	err = json.Unmarshal(body, &rate)
+	if err != nil {
+		log.Println(err)
+		err = errors.New("Failed to parse conversion rate data")
+		return 0, err
+	} else if rate.Ratio == 0 {
+		log.Println("Conversion Rate is 0!")
+		err = errors.New("Failed to get conversion rate data")
+		return 0, err
+	}
+
+	return rate.Ratio, nil
 }

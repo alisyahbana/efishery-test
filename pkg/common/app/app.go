@@ -6,8 +6,9 @@ import (
 )
 
 type Config struct {
-	Version string `json:"version"`
-	Port    int    `json:"port"`
+	Version   string `json:"version"`
+	Port      int    `json:"port"`
+	PortFetch int    `json:"port_fetch"`
 }
 
 var cfg *Config
