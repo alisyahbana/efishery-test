@@ -7,7 +7,6 @@ import (
 	"github.com/alisyahbana/efishery-test/pkg/common/key"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/karirdotcom/qframework/pkg/common/qerror"
-	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -15,21 +14,6 @@ import (
 	"strings"
 	"time"
 )
-
-func CreateBcrypt(raw string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(raw), 4)
-	return string(bytes), err
-}
-
-func CompareBcryptAndString(rawBcrypt string, raw string) *error {
-	err := bcrypt.CompareHashAndPassword([]byte(rawBcrypt), []byte(raw))
-
-	if err != nil {
-		return &err
-	}
-
-	return nil
-}
 
 type CommonTokenPayload struct {
 	Username string `json:"username"`
@@ -163,7 +147,7 @@ type CurrencyRate struct {
 }
 
 func GetRatioUSD() (float64, error) {
-	var rate CurrencyRate
+	var rate *CurrencyRate
 	apiKey := "a89dabc7c704a030831d"
 
 	url := fmt.Sprintf("https://free.currconv.com/api/v7/convert?q=IDR_USD&compact=ultra&apiKey=%s", apiKey)
@@ -187,6 +171,12 @@ func GetRatioUSD() (float64, error) {
 		err = errors.New("Failed to get conversion rate data")
 		return 0, err
 	}
-
+	//
+	//c := cache.New(5*time.Minute, 10*time.Minute)
+	//c.Set("usd_ratio", rate, 1*time.Hour)
+	//foo, found := c.Get("usd_ratio")
+	//if found {
+	//	fmt.Println(foo)
+	//}
 	return rate.Ratio, nil
 }
