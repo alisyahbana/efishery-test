@@ -25,4 +25,5 @@ func main() {
 
 func SetRouteFetchApp(router *httprouter.Router) {
 	router.GET("/fetch-product", handler.FetchProduct)
+	router.GET("/fetch-product-compiled", handler.FetchProductCompiled)
 }
