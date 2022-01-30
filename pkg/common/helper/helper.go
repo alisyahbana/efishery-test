@@ -7,6 +7,7 @@ import (
 	"github.com/alisyahbana/efishery-test/pkg/common/key"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/karirdotcom/qframework/pkg/common/qerror"
+	"github.com/patrickmn/go-cache"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -36,6 +37,8 @@ type ProfileResponse struct {
 	UpdatedAt time.Time `json:"updated_at"`
 	Token     string    `json:"token"`
 }
+
+var Cache = cache.New(5*time.Minute, 5*time.Minute)
 
 func CreateCommonToken(payload CommonTokenPayload) (string, error) {
 	expireToken := time.Now().AddDate(0, 1, 0).Unix()
@@ -147,36 +150,57 @@ type CurrencyRate struct {
 }
 
 func GetRatioUSD() (float64, error) {
+	// get from cache
+	cacheKey := "rate-usd-idr"
 	var rate *CurrencyRate
-	apiKey := "a89dabc7c704a030831d"
+	valueCache, found := GetCache(cacheKey)
+	if found {
+		byteData, _ := json.Marshal(valueCache)
+		err := json.Unmarshal(byteData, &rate)
+		if err != nil {
+			return 0, err
+		}
+		fmt.Println("success get ratio from cache")
+	} else {
+		// save to cache
+		apiKey := "a89dabc7c704a030831d"
 
-	url := fmt.Sprintf("https://free.currconv.com/api/v7/convert?q=IDR_USD&compact=ultra&apiKey=%s", apiKey)
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Println(err)
-		err = errors.New("Failed to get conversion rate")
-		return 0, err
+		url := fmt.Sprintf("https://free.currconv.com/api/v7/convert?q=IDR_USD&compact=ultra&apiKey=%s", apiKey)
+		resp, err := http.Get(url)
+		if err != nil {
+			log.Println(err)
+			err = errors.New("Failed to get conversion rate")
+			return 0, err
+		}
+		defer resp.Body.Close()
+
+		body, _ := ioutil.ReadAll(resp.Body)
+
+		err = json.Unmarshal(body, &rate)
+		if err != nil {
+			log.Println(err)
+			err = errors.New("Failed to parse conversion rate data")
+			return 0, err
+		} else if rate.Ratio == 0 {
+			log.Println("Conversion Rate is 0!")
+			err = errors.New("Failed to get conversion rate data")
+			return 0, err
+		}
+		SaveCache(cacheKey, rate)
 	}
-	defer resp.Body.Close()
-
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	err = json.Unmarshal(body, &rate)
-	if err != nil {
-		log.Println(err)
-		err = errors.New("Failed to parse conversion rate data")
-		return 0, err
-	} else if rate.Ratio == 0 {
-		log.Println("Conversion Rate is 0!")
-		err = errors.New("Failed to get conversion rate data")
-		return 0, err
-	}
-	//
-	//c := cache.New(5*time.Minute, 10*time.Minute)
-	//c.Set("usd_ratio", rate, 1*time.Hour)
-	//foo, found := c.Get("usd_ratio")
-	//if found {
-	//	fmt.Println(foo)
-	//}
 	return rate.Ratio, nil
+}
+
+func SaveCache(key string, valude interface{}) bool {
+	Cache.Set(key, valude, 1*time.Hour)
+	return true
+}
+
+func GetCache(key string) (interface{}, bool) {
+	var value interface{}
+	dataCache, found := Cache.Get(key)
+	if found {
+		value = dataCache.(interface{})
+	}
+	return value, found
 }
