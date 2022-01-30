@@ -27,5 +27,5 @@ func SetRoute(router *httprouter.Router) {
 	router.GET("/", handler.InfoHandler)
 	router.POST("/register", handler.RegisterHandler)
 	router.POST("/login", handler.LoginHandler)
-	router.POST("/auth", handler.AuthTokenHandler)
+	router.GET("/auth", handler.AuthTokenHandler)
 }
