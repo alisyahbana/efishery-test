@@ -37,14 +37,6 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:950e336aff8e79c10804d80804594997e6d37b3316d1576d1ea164d719630110"
-  name = "github.com/karirdotcom/qframework"
-  packages = ["pkg/common/qerror"]
-  pruneopts = "UT"
-  revision = "0936041f2f440df2131de4fd4818fe65aaf65419"
-  version = "91"
-
-[[projects]]
   digest = "1:808cdddf087fb64baeae67b8dfaee2069034d9704923a3cb8bd96a995421a625"
   name = "github.com/patrickmn/go-cache"
   packages = ["."]
@@ -68,7 +60,6 @@
     "github.com/go-sql-driver/mysql",
     "github.com/jmoiron/sqlx",
     "github.com/julienschmidt/httprouter",
-    "github.com/karirdotcom/qframework/pkg/common/qerror",
     "github.com/patrickmn/go-cache",
     "github.com/urfave/negroni",
   ]

@@ -7,7 +7,6 @@ import (
 	"github.com/alisyahbana/efishery-test/pkg/common/key"
 	"github.com/alisyahbana/efishery-test/pkg/service/user/data"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/karirdotcom/qframework/pkg/common/qerror"
 	"log"
 	"time"
 )
@@ -107,7 +106,7 @@ func (s UserService) ValidateToken(tokenAuhorization string) (*data.UserClaims, 
 	if token != nil && err == nil {
 		claim := token.Claims.(jwt.MapClaims)
 		if claim.VerifyExpiresAt(time.Now().Unix(), false) == false {
-			return nil, qerror.NewValidationError("ACCESS_TOKEN_EXPIRED")
+			return nil, fmt.Errorf("ACCESS_TOKEN_EXPIRED")
 		}
 
 		resp := data.UserClaims{

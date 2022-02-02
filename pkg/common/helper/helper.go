@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/alisyahbana/efishery-test/pkg/common/key"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/karirdotcom/qframework/pkg/common/qerror"
 	"github.com/patrickmn/go-cache"
 	"io/ioutil"
 	"log"
@@ -84,7 +83,7 @@ func AuthorizeUser(r *http.Request) (*ProfileResponse, error) {
 	if token != nil && err == nil {
 		claim := token.Claims.(jwt.MapClaims)
 		if claim.VerifyExpiresAt(time.Now().Unix(), false) == false {
-			return nil, qerror.NewValidationError("ACCESS_TOKEN_EXPIRED")
+			return nil, fmt.Errorf("ACCESS_TOKEN_EXPIRED")
 		}
 
 		body = CommonTokenPayload{
